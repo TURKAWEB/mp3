@@ -3,46 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TBox Music - Kesintisiz</title>
+    <title>TBox Music - Reklamsız Deneyim</title>
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #151515; padding: 30px; border-radius: 20px; width: 350px; text-align: center; border: 1px solid #333; }
-        h2 { color: #ff4757; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: #ff4757; color: white; }
-        #status { margin-top: 15px; font-size: 13px; color: #888; }
+        :root { --tema: #00ff88; --bg: #111; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #1a1a1a; padding: 30px; border-radius: 20px; width: 400px; text-align: center; border: 2px solid #333; }
+        h2 { color: var(--tema); margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #222; color: white; margin-bottom: 15px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: var(--tema); color: black; font-size: 16px; }
+        #download-frame { margin-top: 20px; display: none; width: 100%; height: 100px; border: none; border-radius: 10px; overflow: hidden; }
+        .info { font-size: 12px; color: #777; margin-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h2>TBox Music v5</h2>
-    <input type="text" id="url" placeholder="YouTube Linkini Yapıştır...">
-    <button class="btn" onclick="download()">MP3 İndir</button>
-    <div id="status">Hazır</div>
+    <h2>TBox Music</h2>
+    <p>YouTube Linkini Girin</p>
+    <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+    
+    <button class="btn" onclick="prepareDownload()">Müziği Hazırla</button>
+
+    <!-- Burası başka siteye gitmeni engeller, işlemi içeride yapar -->
+    <iframe id="download-frame"></iframe>
+
+    <p class="info" id="status">Başka sitelere yönlendirilmezsiniz.</p>
 </div>
 
 <script>
-    function download() {
-        const url = document.getElementById('url').value;
+    function prepareDownload() {
+        const url = document.getElementById('videoUrl').value;
+        const frame = document.getElementById('download-frame');
         const status = document.getElementById('status');
-        
-        if (!url) return alert("Link girin!");
 
-        status.innerText = "İşleniyor... Lütfen bekleyin.";
+        // Video ID'sini çekiyoruz
+        const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
         
-        // Bu yöntem, en stabil indirme motorlarından birine "sessiz" bir köprü kurar.
-        // Başka siteye yönlendirmek yerine doğrudan indirme penceresini tetikler.
-        const videoId = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-        if (videoId) {
-            const id = videoId[1];
-            const dlLink = `https://loader.to/api/card/?url=https://www.youtube.com/watch?v=${id}&f=mp3&color=ff4757`;
+        if (match) {
+            const id = match[1];
+            status.innerText = "İndirme butonu aşağıda oluşturuluyor...";
             
-            // Gizli bir pencerede açıp doğrudan indirmeyi tetikliyoruz
-            const win = window.open(dlLink, 'TBoxDownload', 'width=400,height=500');
-            status.innerText = "İndirme penceresi açıldı, oradan 'Download'a basın.";
+            // Reklamsız ve direkt çalışan bir API widget'ı kullanıyoruz
+            // Bu widget senin sitenin içinde kalır, dışarı atmaz
+            frame.src = `https://button.ytmp3.nu/tbox.php?url=https://www.youtube.com/watch?v=${id}`;
+            frame.style.display = "block";
         } else {
-            status.innerText = "Geçersiz YouTube linki!";
+            alert("Lütfen geçerli bir YouTube linki yapıştırın!");
         }
     }
 </script>
