@@ -28,7 +28,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 20px;
+            padding: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -39,24 +39,29 @@
         /* Link Girişi Yerleşimi */
         .input-container {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
-        /* Logo Ayarları */
+        /* Logo Ayarları - Boyut Büyütüldü */
         .logo-container img {
-            height: 45px; /* Logonun büyüklüğü */
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+            height: 80px; /* Logo daha büyük yapıldı */
+            width: auto;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
         }
 
         /* Mobil Uyumluluk Ayarları */
         @media (max-width: 767px) {
             .header {
                 flex-direction: column-reverse;
-                gap: 20px;
+                gap: 25px;
                 text-align: center;
+                padding-top: 15px;
             }
             .input-container {
                 justify-content: center;
+            }
+            .logo-container img {
+                height: 65px; /* Mobilde biraz daha dengeli boyut */
             }
         }
 
@@ -64,23 +69,25 @@
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid var(--neon);
             color: white;
-            padding: 12px 15px;
-            border-radius: 10px;
+            padding: 12px 18px;
+            border-radius: 12px;
             outline: none;
-            width: 220px;
+            width: 250px;
+            font-size: 14px;
             transition: 0.3s;
         }
 
-        input:focus { border-color: white; box-shadow: 0 0 10px var(--neon); }
+        input:focus { border-color: white; box-shadow: 0 0 15px var(--neon); }
 
         button {
             background: var(--neon);
             color: black;
             border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 10px 25px;
+            border-radius: 12px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 15px;
             transition: 0.3s;
         }
 
@@ -93,15 +100,15 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding-top: 60px; /* Header'a çarpmaması için */
+            padding-top: 100px;
         }
 
         #display-area {
             width: 85%;
             height: 65%;
-            max-width: 1100px;
+            max-width: 1200px;
             display: none;
-            border-radius: 20px;
+            border-radius: 25px;
             overflow: hidden;
             box-shadow: 0 0 60px rgba(0, 255, 136, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -114,9 +121,10 @@
             bottom: 15px;
             right: 20px;
             color: var(--neon);
-            font-size: 12px;
-            letter-spacing: 3px;
+            font-size: 11px;
+            letter-spacing: 4px;
             font-weight: bold;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -125,13 +133,13 @@
     <div class="header">
         <!-- Sol Üst: Link Girişi -->
         <div class="input-container">
-            <input type="text" id="url" placeholder="YouTube Linkini Yapıştır...">
+            <input type="text" id="url" placeholder="Şarkı linkini buraya bırak...">
             <button onclick="cal()">ÇAL</button>
         </div>
 
-        <!-- Sağ Üst: TurkaCloud Logo -->
+        <!-- Sağ Üst: TurkaCloud Logo (Referans Dosya) -->
         <div class="logo-container">
-            <img src="https://i.ibb.co/LdbYmGv/Screenshot-2024-05-04-21-48-28.png" alt="TurkaCloud Logo">
+            <img src="TURKACLOUD.jpg" alt="TurkaCloud Logo">
         </div>
     </div>
 
@@ -158,7 +166,7 @@
                     </iframe>
                 `;
             } else {
-                alert("Lütfen geçerli bir YouTube linki girin!");
+                alert("Lütfen geçerli bir müzik linki girin!");
             }
         }
     </script>
