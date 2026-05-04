@@ -3,59 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TBox Music Web V7</title>
+    <title>TBox Music - Global Fix</title>
     <style>
-        body { background: #050505; color: #eee; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #111; padding: 30px; border-radius: 20px; width: 380px; text-align: center; border: 1px solid #222; box-shadow: 0 15px 40px rgba(0,0,0,0.8); }
-        h1 { color: #00ffcc; font-size: 24px; margin-bottom: 10px; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #1a1a1a; color: white; margin-bottom: 20px; box-sizing: border-box; outline: none; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: #00ffcc; color: #000; font-size: 16px; transition: 0.3s; }
-        .btn:hover { background: #00cca3; }
-        #status { margin-top: 15px; font-size: 13px; color: #888; }
-        #player-area { margin-top: 20px; display: none; }
-        iframe { width: 100%; height: 60px; border-radius: 10px; border: none; background: transparent; }
+        body { background: #000; color: #00ff88; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #111; padding: 25px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #00ff88; box-shadow: 0 0 20px #00ff8844; }
+        input { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #00ff88; background: #000; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; background: #00ff88; color: #000; transition: 0.3s; }
+        #download-zone { margin-top: 20px; display: none; padding: 10px; border-top: 1px dashed #444; }
+        iframe { width: 100%; height: 50px; border: none; }
     </style>
 </head>
 <body>
 
 <div class="box">
-    <h1>TBox Music V7</h1>
-    <p>YouTube Linkini Buraya Yapıştırın</p>
-    <input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=...">
-    
-    <button class="btn" onclick="startProcess()">Müziği Hazırla</button>
+    <h2>TBox Music V8</h2>
+    <p style="color: #fff; font-size: 12px;">Ülke hatası giderildi.</p>
+    <input type="text" id="videoLink" placeholder="YouTube Linkini Girin...">
+    <button onclick="fixAndDownload()">Müziği Hazırla</button>
 
-    <div id="player-area">
-        <div id="api-frame"></div>
-        <p id="status">İşlem başlatıldı...</p>
+    <div id="download-zone">
+        <div id="api-inject"></div>
+        <p style="font-size: 11px; color: #888;">Buton birazdan görünecektir...</p>
     </div>
 </div>
 
 <script>
-    function startProcess() {
-        const url = document.getElementById('urlInput').value;
-        const status = document.getElementById('status');
-        const playerArea = document.getElementById('player-area');
-        const apiFrame = document.getElementById('api-frame');
+    function fixAndDownload() {
+        const url = document.getElementById('videoLink').value;
+        const zone = document.getElementById('download-zone');
+        const inject = document.getElementById('api-inject');
 
-        // Video ID Ayıklama
         const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
         
         if (match) {
             const id = match[1];
-            playerArea.style.display = "block";
-            status.innerText = "Lütfen bekleyin, MP3 butonu oluşturuluyor...";
+            zone.style.display = "block";
             
-            // Reklamsız ve yönlendirmesiz çalışan güncel API Widget'ı
-            // Bu widget doğrudan senin sayfanın içinde bir buton oluşturur.
-            apiFrame.innerHTML = `
+            // Ülke veya IP kısıtlaması yapmayan, en geniş kapsamlı widget'ı kullanıyoruz.
+            // Bu API genellikle "invalid country" hatası vermez.
+            inject.innerHTML = `
                 <iframe 
-                    src="https://convert2mp3s.com/api/button/mp3/${id}" 
+                    src="https://api.vevioz.com/@api/button/mp3/${id}" 
                     scrolling="no">
                 </iframe>
             `;
         } else {
-            alert("Lütfen geçerli bir YouTube linki girin!");
+            alert("Lütfen geçerli bir YouTube linki gir!");
         }
     }
 </script>
