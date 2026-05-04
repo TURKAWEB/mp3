@@ -3,136 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TBox Music - MP3 Downloader</title>
+    <title>TBox Music - Background Player & Downloader</title>
     <style>
         :root {
-            --primary: #ff0000;
-            --bg: #0f0f0f;
+            --primary: #ff4757;
+            --bg: #121212;
             --card: #1e1e1e;
             --text: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg);
             color: var(--text);
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             margin: 0;
         }
 
         .container {
-            background-color: var(--card);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 500px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            width: 400px;
             text-align: center;
         }
 
-        h1 { color: var(--primary); margin-bottom: 1.5rem; }
+        h1 { color: var(--primary); font-size: 24px; margin-bottom: 20px; }
 
         input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #333;
-            border-radius: 8px;
-            background: #121212;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #252525;
             color: white;
+            margin-bottom: 15px;
             box-sizing: border-box;
-            margin-bottom: 1rem;
         }
+
+        .btn-group { display: flex; gap: 10px; flex-direction: column; }
 
         button {
-            width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 8px;
-            background-color: var(--primary);
-            color: white;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: 0.3s;
         }
 
-        button:active { transform: scale(0.98); }
+        .play-btn { background: var(--primary); color: white; }
+        .dl-btn { background: #2f3542; color: white; }
 
-        #preview {
-            margin-top: 1.5rem;
+        #player-area {
+            margin-top: 20px;
             display: none;
+            border-top: 1px solid #333;
+            padding-top: 20px;
         }
 
-        #preview img {
+        iframe {
+            border-radius: 10px;
             width: 100%;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            height: 200px;
+            background: #000;
         }
 
-        .download-btn {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #27ae60;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+        .info-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>TBox Music</h1>
-        <p>YouTube Linkini Yapıştır ve MP3 İndir</p>
-        
-        <input type="text" id="videoLink" placeholder="https://www.youtube.com/watch?v=...">
-        <button onclick="processVideo()">Müziği Hazırla</button>
-
-        <div id="preview">
-            <img id="thumb" src="" alt="Video Önizleme">
-            <h3 id="videoTitle">Video Başlığı</h3>
-            <!-- Harici API Yönlendirmesi -->
-            <div id="downloadArea"></div>
-        </div>
+<div class="container">
+    <h1>TBox Music V2</h1>
+    <input type="text" id="videoUrl" placeholder="YouTube Linkini Buraya Yapıştırın...">
+    
+    <div class="btn-group">
+        <button class="play-btn" onclick="playMusic()">Şimdi Çal (Arka Plan)</button>
+        <button class="dl-btn" onclick="downloadMusic()">Müziği İndir</button>
     </div>
 
-    <script>
-        function extractVideoID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+    <div id="player-area">
+        <div id="videoContainer"></div>
+        <p id="status">Müzik Çalıyor...</p>
+        <p class="info-text">Mobil cihazlarda arka planda çalması için sekmeyi kapatmayın, sadece başka sekmeye geçin.</p>
+    </div>
+</div>
 
-        function processVideo() {
-            const url = document.getElementById('videoLink').value;
-            const videoId = extractVideoID(url);
-            
-            if (videoId) {
-                // Önizlemeyi göster
-                document.getElementById('preview').style.display = 'block';
-                document.getElementById('thumb').src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-                document.getElementById('videoTitle').innerText = "Video Hazır!";
+<script>
+    function getID(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
 
-                // İndirme Butonu Oluştur (Ücretsiz bir API servisi kullanarak)
-                // Not: Bu servisler zaman zaman değişebilir, örnek amaçlı yerleştirilmiştir.
-                const downloadArea = document.getElementById('downloadArea');
-                downloadArea.innerHTML = `
-                    <a href="https://js.vov.sh/api/button/mp3/${videoId}" 
-                       target="_blank" 
-                       class="download-btn">
-                       MP3 Olarak İndir
-                    </a>
-                `;
-            } else {
-                alert("Lütfen geçerli bir YouTube linki girin!");
-            }
+    function playMusic() {
+        const url = document.getElementById('videoUrl').value;
+        const id = getID(url);
+
+        if (id) {
+            document.getElementById('player-area').style.display = 'block';
+            // Arka planda çalma desteği için YouTube Embed kullanıyoruz
+            // autoplay=1 ve mute=0 (ses açık) parametreleri ekliyoruz
+            document.getElementById('videoContainer').innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playlist=${id}" 
+                    frameborder="0" 
+                    allow="autoplay; encrypted-media; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+            document.getElementById('status').innerText = "Oynatılıyor... (Diğer sekmelere geçebilirsiniz)";
+        } else {
+            alert("Lütfen geçerli bir link girin.");
         }
-    </script>
+    }
+
+    function downloadMusic() {
+        const url = document.getElementById('videoUrl').value;
+        const id = getID(url);
+
+        if (id) {
+            // "Yanıt verilmesi uzun sürdü" hatasını aşmak için yönlendirme yöntemi
+            // Bu yöntem doğrudan stabil indirme sunucusuna bağlar
+            const dlLink = `https://www.y2mate.com/youtube/${id}`;
+            window.open(dlLink, '_blank');
+        } else {
+            alert("Lütfen geçerli bir link girin.");
+        }
+    }
+</script>
 
 </body>
 </html>
