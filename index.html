@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBox Music - MP3 Downloader</title>
+    <style>
+        :root {
+            --primary: #ff0000;
+            --bg: #0f0f0f;
+            --card: #1e1e1e;
+            --text: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary); margin-bottom: 1.5rem; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #121212;
+            color: white;
+            box-sizing: border-box;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        #preview {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        #preview img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>TBox Music</h1>
+        <p>YouTube Linkini Yapıştır ve MP3 İndir</p>
+        
+        <input type="text" id="videoLink" placeholder="https://www.youtube.com/watch?v=...">
+        <button onclick="processVideo()">Müziği Hazırla</button>
+
+        <div id="preview">
+            <img id="thumb" src="" alt="Video Önizleme">
+            <h3 id="videoTitle">Video Başlığı</h3>
+            <!-- Harici API Yönlendirmesi -->
+            <div id="downloadArea"></div>
+        </div>
+    </div>
+
+    <script>
+        function extractVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function processVideo() {
+            const url = document.getElementById('videoLink').value;
+            const videoId = extractVideoID(url);
+            
+            if (videoId) {
+                // Önizlemeyi göster
+                document.getElementById('preview').style.display = 'block';
+                document.getElementById('thumb').src = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+                document.getElementById('videoTitle').innerText = "Video Hazır!";
+
+                // İndirme Butonu Oluştur (Ücretsiz bir API servisi kullanarak)
+                // Not: Bu servisler zaman zaman değişebilir, örnek amaçlı yerleştirilmiştir.
+                const downloadArea = document.getElementById('downloadArea');
+                downloadArea.innerHTML = `
+                    <a href="https://js.vov.sh/api/button/mp3/${videoId}" 
+                       target="_blank" 
+                       class="download-btn">
+                       MP3 Olarak İndir
+                    </a>
+                `;
+            } else {
+                alert("Lütfen geçerli bir YouTube linki girin!");
+            }
+        }
+    </script>
+
+</body>
+</html>
