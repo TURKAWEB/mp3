@@ -3,52 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TBox Music - Global Fix</title>
+    <title>TBox Music - Otomatik İndirici</title>
     <style>
-        body { background: #000; color: #00ff88; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #111; padding: 25px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #00ff88; box-shadow: 0 0 20px #00ff8844; }
-        input { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #00ff88; background: #000; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; background: #00ff88; color: #000; transition: 0.3s; }
-        #download-zone { margin-top: 20px; display: none; padding: 10px; border-top: 1px dashed #444; }
-        iframe { width: 100%; height: 50px; border: none; }
+        body { background: #080808; color: #00ff88; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #111; padding: 30px; border-radius: 20px; width: 350px; text-align: center; border: 2px solid #222; box-shadow: 0 0 30px rgba(0,255,136,0.1); }
+        h1 { margin-bottom: 20px; font-size: 26px; text-shadow: 0 0 10px #00ff88; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333; background: #000; color: white; margin-bottom: 20px; box-sizing: border-box; outline: none; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; background: #00ff88; color: #000; font-size: 16px; transition: 0.3s; }
+        .btn:disabled { background: #444; cursor: not-allowed; }
+        #status { margin-top: 20px; font-size: 14px; color: #888; min-height: 20px; }
+        .loader { border: 3px solid #222; border-top: 3px solid #00ff88; border-radius: 50%; width: 25px; height: 25px; animation: spin 1s linear infinite; display: none; margin: 15px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>TBox Music V8</h2>
-    <p style="color: #fff; font-size: 12px;">Ülke hatası giderildi.</p>
-    <input type="text" id="videoLink" placeholder="YouTube Linkini Girin...">
-    <button onclick="fixAndDownload()">Müziği Hazırla</button>
-
-    <div id="download-zone">
-        <div id="api-inject"></div>
-        <p style="font-size: 11px; color: #888;">Buton birazdan görünecektir...</p>
-    </div>
+<div class="card">
+    <h1>TBox Music</h1>
+    <input type="text" id="link" placeholder="YouTube Linkini Yapıştır...">
+    <button class="btn" id="btn" onclick="indir()">Dosyayı İndir</button>
+    <div class="loader" id="loading"></div>
+    <div id="status">Hazır bekliyor...</div>
 </div>
 
 <script>
-    function fixAndDownload() {
-        const url = document.getElementById('videoLink').value;
-        const zone = document.getElementById('download-zone');
-        const inject = document.getElementById('api-inject');
+    async function indir() {
+        const urlInput = document.getElementById('link').value;
+        const status = document.getElementById('status');
+        const loading = document.getElementById('loading');
+        const btn = document.getElementById('btn');
 
-        const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-        
-        if (match) {
-            const id = match[1];
-            zone.style.display = "block";
-            
-            // Ülke veya IP kısıtlaması yapmayan, en geniş kapsamlı widget'ı kullanıyoruz.
-            // Bu API genellikle "invalid country" hatası vermez.
-            inject.innerHTML = `
-                <iframe 
-                    src="https://api.vevioz.com/@api/button/mp3/${id}" 
-                    scrolling="no">
-                </iframe>
-            `;
-        } else {
-            alert("Lütfen geçerli bir YouTube linki gir!");
+        if (!urlInput) return alert("Link girmediniz!");
+
+        // Arayüz kilitleme ve yükleme animasyonu
+        btn.disabled = true;
+        loading.style.display = "block";
+        status.innerText = "Sunucu ile bağlantı kuruluyor...";
+
+        try {
+            // Cobalt API - Reklamsız ve doğrudan indirme sağlar
+            const response = await fetch("https://api.cobalt.tools/api/json", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    url: urlInput,
+                    downloadMode: "audio", // Sadece ses
+                    audioFormat: "mp3"
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status === "stream" || data.url) {
+                status.innerText = "İndirme başlatılıyor!";
+                
+                // Gizli indirme tetikleyici
+                const gizliLink = document.createElement('a');
+                gizliLink.href = data.url;
+                gizliLink.download = "TBox_Muzik.mp3";
+                document.body.appendChild(gizliLink);
+                gizliLink.click();
+                document.body.removeChild(gizliLink);
+                
+                status.innerText = "Tamamlandı!";
+            } else {
+                status.innerText = "Hata: Sunucu dosyayı hazırlayamadı.";
+            }
+        } catch (error) {
+            status.innerText = "Hata: Sunucuya bağlanılamadı.";
+            console.error(error);
+        } finally {
+            btn.disabled = false;
+            loading.style.display = "none";
         }
     }
 </script>
